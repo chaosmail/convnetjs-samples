@@ -6284,6 +6284,7 @@ var Net;
 /// <reference path="./Model.ts" />
 /// <reference path="./Vol.ts" />
 /// <reference path="./CaffeModel.ts" />
+/// <reference path="./Layers/_module.ts" />
 /// <reference path="../Net/_module.ts" />
 /// <reference path="../NumJS/_module.ts" />
 //import {Promise} from 'es6-shim';
