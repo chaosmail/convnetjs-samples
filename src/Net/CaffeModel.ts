@@ -113,6 +113,7 @@ namespace Net {
           opt.sx = pp.kernel_size !== undefined ? +pp.kernel_size : undefined;
           opt.pad = pp.pad !== undefined ? +pp.pad : undefined;
           opt.stride = pp.stride !== undefined ? +pp.stride : undefined;
+          opt.global_pooling = pp.global_pooling !== undefined &&  pp.global_pooling !== 'false' ? true : false;
           layer = new Layers.PoolLayer(opt);
           break;
 

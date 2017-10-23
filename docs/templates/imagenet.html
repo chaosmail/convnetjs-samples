@@ -1,11 +1,12 @@
 {% set navimagenet = true %}
 {% extends "base.html" %}
 
-{% block title %}ImageNet Classification{% endblock %}
+{% block title %}ImageNet{% endblock %}
 
 {% block header %}
 <script src="libs/d3.min.js"></script>
 <script src="dist/caffe.js"></script>
+<script src="data/ilsvrc11/imagenet_urls.js"></script>
 
 <script src="libs/long.min.js"></script>
 <script src="libs/bytebuffer.min.js"></script>
@@ -45,7 +46,7 @@
   }
 
   .camera, video, .model-layout svg, canvas.image {
-    width: 100% !important;
+    width: 128 !important;
     height: auto !important;
   }
 </style>
@@ -144,30 +145,16 @@
     console.log('Mean', mean)
 
     loadModel();
-    initialImage();
+    nextImage();
   });
 
-  function initialImage() {
-    // Add a timestamp to prevent caching
-    var imgUrl = 'models/caffenet/hongbao.jpg';
-    image = new ImgJS.Image(imgUrl);
+  function nextImage() {
+    var randImg = imagenet_urls[Math.floor(Math.random() * imagenet_urls.length)];
+
+    console.log('Loading image ' + randImg.label + ': ' + randImg.url);
+    image = new ImgJS.Image(randImg.url);
     image.load().then(function(){
       image.render($imgSrc);
-    });
-  }
-
-  function nextImage() {
-    // Add a timestamp to prevent caching
-    var apiUrl = 'https://dataset.at/imagenet/sample/' + '?' + new Date().getTime();
-    var req = new Request(apiUrl);
-    fetch(req).then(function(response){
-      response.json().then(function(d){
-        console.log('Loading image ' + d.data.url);
-        image = new ImgJS.Image(d.data.url);
-        image.load().then(function(){
-          image.render($imgSrc);
-        });
-      });
     });
   }
 
@@ -206,8 +193,8 @@
   function loadModel() {
 
     model = new Net.CaffeModel(
-      'models/caffenet/simple_net_deploy.prototxt',
-      'models/caffenet/weights/'
+      'models/squeezenet/deploy.prototxt',
+      'models/squeezenet/weights/'
     );
 
     model.load().then(function(){
@@ -218,7 +205,7 @@
       d3.selectAll('.model-name').style('display', 'block');
       d3.selectAll('.model-link').style('display', 'block');
 
-      var dag = Utils.GraphDrawer.fromNet(model);
+      var dag = Utils.GraphDrawer.fromNet(model, true);
         dag.render('.model-layout', 2*width, height).fit().rotate();
     });
   }
