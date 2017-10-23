@@ -1,0 +1,71 @@
+{% set navcreator = true %}
+{% extends "base.html" %}
+
+{% block title %}Deep Learning Model Creator{% endblock %}
+
+{% block header %}
+<script src="libs/d3.min.js"></script>
+<script src="dist/caffe.js"></script>
+
+<!-- For drawing the graph -->
+<script src="libs/lodash.min.js"></script>
+<script src="libs/graphlib.core.min.js"></script>
+<script src="libs/dagre.core.min.js"></script>
+<script src="libs/dagre-d3.core.min.js"></script>
+<link rel="stylesheet" href="styles/graph.css">
+
+<style>
+  .page-content {
+    height: 100%;
+    position: relative;
+  }
+
+  #model-def {
+    min-height: 24rem;
+    width: 100%;
+    height: 100% !important;
+  }
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div class="mdl-grid grid-container">
+  <div class="mdl-cell mdl-cell--6-col">
+    <p>Press `shift` + `enter` to update model</p>
+    <textarea id="model-def"></textarea>
+  </div>
+  <div class="mdl-cell mdl-cell--6-col">
+    <div class="model"></div>
+  </div>
+</div>
+
+<script language="JavaScript">
+
+var modelDef = d3.select("#model-def");
+
+modelDef
+  .on("keydown", function() {
+    var e = d3.event;
+    if (e.key == "Enter" && e.shiftKey == true) {
+      console.clear();
+      reloadModel(modelDef.node().value);
+      d3.event.stopPropagation();
+      d3.event.preventDefault();
+    }
+  });
+
+function reloadModel(def) {
+  // Let's create a new model from the definition
+  var model = new Net.CaffeModel().fromText(def);
+  
+  // Debug the structure
+  model.debugStructure();
+
+  // Render the Graph structure
+  var dag = Utils.GraphDrawer.fromNet(model);
+  dag.render('.model', 900);
+}
+
+</script>
+{% endblock %}
