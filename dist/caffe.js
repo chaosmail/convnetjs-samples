@@ -6226,6 +6226,8 @@ var Net;
         CaffeModel.prototype.createEdges = function () {
             var _this = this;
             this.edges = [];
+            var edgeSet = d3.set();
+            var getEdgeId = function (a, b) { return a + ":#:" + b; };
             this.layers.values()
                 .filter(function (d) { return d.input !== undefined && d.input !== d.output; })
                 .forEach(function (d) {
@@ -6234,7 +6236,10 @@ var Net;
                 }
                 else {
                     d.input.forEach(function (layerName) {
-                        _this.edges.push({ from: layerName, to: d.output });
+                        if (!edgeSet.has(getEdgeId(layerName, d.output))) {
+                            _this.edges.push({ from: layerName, to: d.output });
+                            edgeSet.add(getEdgeId(layerName, d.output));
+                        }
                     });
                 }
             });
@@ -6249,7 +6254,10 @@ var Net;
                     .filter(function (edge) { return edge.from === d.input; })
                     .forEach(function (edge) {
                     edge.from = d.name;
-                    _this.edges.push({ from: d.input, to: d.name });
+                    if (!edgeSet.has(getEdgeId(d.input, d.name))) {
+                        _this.edges.push({ from: d.input, to: d.name });
+                        edgeSet.add(getEdgeId(d.input, d.name));
+                    }
                 });
             });
         };
